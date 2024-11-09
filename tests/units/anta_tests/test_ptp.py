@@ -8,12 +8,12 @@ from __future__ import annotations
 from typing import Any
 
 from anta.tests.ptp import (
+    VerifyPtpDomain,
     VerifyPtpGMStatus,
     VerifyPtpLockStatus,
     VerifyPtpModeStatus,
     VerifyPtpOffset,
     VerifyPtpPortModeStatus,
-    VerifyPtpDomain,
 )
 from tests.units.anta_tests import test
 
