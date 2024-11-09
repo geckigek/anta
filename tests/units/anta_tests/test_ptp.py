@@ -48,9 +48,7 @@ DATA: list[dict[str, Any]] = [
         "inputs": None,
         "expected": {
             "result": "failure",
-            "messages": [
-                "The device is not configured as a PTP Boundary Clock: 'ptpDisabled'"
-            ],
+            "messages": ["The device is not configured as a PTP Boundary Clock: 'ptpDisabled'"],
         },
     },
     {
@@ -251,11 +249,7 @@ DATA: list[dict[str, Any]] = [
         "inputs": None,
         "expected": {
             "result": "failure",
-            "messages": [
-                (
-                    "The device timing offset from master is greater than +/- 1000ns: {'Ethernet27/1': [1200, -1300]}"
-                )
-            ],
+            "messages": [("The device timing offset from master is greater than +/- 1000ns: {'Ethernet27/1': [1200, -1300]}")],
         },
     },
     {
@@ -380,9 +374,7 @@ DATA: list[dict[str, Any]] = [
         "inputs": None,
         "expected": {
             "result": "failure",
-            "messages": [
-                "The following interface(s) are not in a valid PTP state: '['Ethernet53', 'Ethernet1']'"
-            ],
+            "messages": ["The following interface(s) are not in a valid PTP state: '['Ethernet53', 'Ethernet1']'"],
         },
     },
     {
