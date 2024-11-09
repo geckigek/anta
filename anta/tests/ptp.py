@@ -35,7 +35,9 @@ class VerifyPtpModeStatus(AntaTest):
 
     description = "Verifies that the device is configured as a PTP Boundary Clock."
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp", revision=2)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp", revision=2)
+    ]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -48,7 +50,9 @@ class VerifyPtpModeStatus(AntaTest):
             return
 
         if ptp_mode != "ptpBoundaryClock":
-            self.result.is_failure(f"The device is not configured as a PTP Boundary Clock: '{ptp_mode}'")
+            self.result.is_failure(
+                f"The device is not configured as a PTP Boundary Clock: '{ptp_mode}'"
+            )
         else:
             self.result.is_success()
 
@@ -81,7 +85,9 @@ class VerifyPtpGMStatus(AntaTest):
 
     description = "Verifies that the device is locked to a valid PTP Grandmaster."
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp", revision=2)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp", revision=2)
+    ]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -118,9 +124,13 @@ class VerifyPtpLockStatus(AntaTest):
     ```
     """
 
-    description = "Verifies that the device was locked to the upstream PTP GM in the last minute."
+    description = (
+        "Verifies that the device was locked to the upstream PTP GM in the last minute."
+    )
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp", revision=2)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp", revision=2)
+    ]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -133,10 +143,15 @@ class VerifyPtpLockStatus(AntaTest):
             self.result.is_skipped("PTP is not configured")
             return
 
-        time_difference = ptp_clock_summary["currentPtpSystemTime"] - ptp_clock_summary["lastSyncTime"]
+        time_difference = (
+            ptp_clock_summary["currentPtpSystemTime"]
+            - ptp_clock_summary["lastSyncTime"]
+        )
 
         if time_difference >= threshold:
-            self.result.is_failure(f"The device lock is more than {threshold}s old: {time_difference}s")
+            self.result.is_failure(
+                f"The device lock is more than {threshold}s old: {time_difference}s"
+            )
         else:
             self.result.is_success()
 
@@ -160,7 +175,9 @@ class VerifyPtpOffset(AntaTest):
 
     description = "Verifies that the PTP timing offset is within +/- 1000ns from the master clock."
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp monitor", revision=1)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp monitor", revision=1)
+    ]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -176,10 +193,14 @@ class VerifyPtpOffset(AntaTest):
 
         for interface in command_output["ptpMonitorData"]:
             if abs(interface["offsetFromMaster"]) > threshold:
-                offset_interfaces.setdefault(interface["intf"], []).append(interface["offsetFromMaster"])
+                offset_interfaces.setdefault(interface["intf"], []).append(
+                    interface["offsetFromMaster"]
+                )
 
         if offset_interfaces:
-            self.result.is_failure(f"The device timing offset from master is greater than +/- {threshold}ns: {offset_interfaces}")
+            self.result.is_failure(
+                f"The device timing offset from master is greater than +/- {threshold}ns: {offset_interfaces}"
+            )
         else:
             self.result.is_success()
 
@@ -204,7 +225,9 @@ class VerifyPtpPortModeStatus(AntaTest):
 
     description = "Verifies the PTP interfaces state."
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp", revision=2)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp", revision=2)
+    ]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -220,11 +243,63 @@ class VerifyPtpPortModeStatus(AntaTest):
         invalid_interfaces = [
             interface
             for interface in command_output["ptpIntfSummaries"]
-            for vlan in command_output["ptpIntfSummaries"][interface]["ptpIntfVlanSummaries"]
+            for vlan in command_output["ptpIntfSummaries"][interface][
+                "ptpIntfVlanSummaries"
+            ]
             if vlan["portState"] not in valid_state
         ]
 
         if not invalid_interfaces:
             self.result.is_success()
         else:
-            self.result.is_failure(f"The following interface(s) are not in a valid PTP state: '{invalid_interfaces}'")
+            self.result.is_failure(
+                f"The following interface(s) are not in a valid PTP state: '{invalid_interfaces}'"
+            )
+
+
+class VerifyPtpDomain(AntaTest):
+    """Verifies that the Precision Time Protocol (PTP) domain is configured correctly.
+
+    Expected Results
+    ----------------
+    * Success: The test will pass if the PTP domain is configured correctly.
+    * Failure: The test will fail if the PTP domain is not configured correctly.
+    * Skipped: The test will be skipped if PTP is not configured on the device.
+
+    Examples
+    --------
+    ```yaml
+    anta.tests.ptp:
+      - VerifyPtpDomain:
+          domain: 122
+    ```
+    """
+
+    class Input(AntaTest.Input):
+        """Input model for the VerifyPtpDomain test."""
+
+        domain: str
+        """Expected PTP domain."""
+
+    description = "Verifies that the PTP domain is configured correctly."
+    categories: ClassVar[list[str]] = ["ptp"]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [
+        AntaCommand(command="show ptp", revision=2)
+    ]
+
+    @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
+    @AntaTest.anta_test
+    def test(self) -> None:
+        """Main test function for VerifyPtpDomain."""
+        command_output = self.instance_commands[0].json_output
+
+        if (ptp_domain := command_output.get("ptpDomain")) is None:
+            self.result.is_skipped("PTP is not configured")
+            return
+
+        if ptp_domain != self.inputs.domain:
+            self.result.is_failure(
+                f"The PTP domain is not configured correctly: '{ptp_domain}'"
+            )
+        else:
+            self.result.is_success()

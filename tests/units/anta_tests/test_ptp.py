@@ -7,7 +7,14 @@ from __future__ import annotations
 
 from typing import Any
 
-from anta.tests.ptp import VerifyPtpGMStatus, VerifyPtpLockStatus, VerifyPtpModeStatus, VerifyPtpOffset, VerifyPtpPortModeStatus
+from anta.tests.ptp import (
+    VerifyPtpGMStatus,
+    VerifyPtpLockStatus,
+    VerifyPtpModeStatus,
+    VerifyPtpOffset,
+    VerifyPtpPortModeStatus,
+    VerifyPtpDomain,
+)
 from tests.units.anta_tests import test
 
 DATA: list[dict[str, Any]] = [
@@ -39,7 +46,12 @@ DATA: list[dict[str, Any]] = [
         "test": VerifyPtpModeStatus,
         "eos_data": [{"ptpMode": "ptpDisabled", "ptpIntfSummaries": {}}],
         "inputs": None,
-        "expected": {"result": "failure", "messages": ["The device is not configured as a PTP Boundary Clock: 'ptpDisabled'"]},
+        "expected": {
+            "result": "failure",
+            "messages": [
+                "The device is not configured as a PTP Boundary Clock: 'ptpDisabled'"
+            ],
+        },
     },
     {
         "name": "skipped",
@@ -158,7 +170,10 @@ DATA: list[dict[str, Any]] = [
             }
         ],
         "inputs": None,
-        "expected": {"result": "failure", "messages": ["The device lock is more than 60s old: 157s"]},
+        "expected": {
+            "result": "failure",
+            "messages": ["The device lock is more than 60s old: 157s"],
+        },
     },
     {
         "name": "skipped",
@@ -236,7 +251,11 @@ DATA: list[dict[str, Any]] = [
         "inputs": None,
         "expected": {
             "result": "failure",
-            "messages": [("The device timing offset from master is greater than +/- 1000ns: {'Ethernet27/1': [1200, -1300]}")],
+            "messages": [
+                (
+                    "The device timing offset from master is greater than +/- 1000ns: {'Ethernet27/1': [1200, -1300]}"
+                )
+            ],
         },
     },
     {
@@ -285,7 +304,14 @@ DATA: list[dict[str, Any]] = [
                     "Ethernet1": {
                         "interface": "Ethernet1",
                         "ptpIntfVlanSummaries": [
-                            {"vlanId": 0, "portState": "psMaster", "delayMechanism": "e2e", "transportMode": "ipv4", "mpassEnabled": False, "mpassStatus": "active"}
+                            {
+                                "vlanId": 0,
+                                "portState": "psMaster",
+                                "delayMechanism": "e2e",
+                                "transportMode": "ipv4",
+                                "mpassEnabled": False,
+                                "mpassStatus": "active",
+                            }
                         ],
                     },
                 },
@@ -299,7 +325,10 @@ DATA: list[dict[str, Any]] = [
         "test": VerifyPtpPortModeStatus,
         "eos_data": [{"ptpIntfSummaries": {}}],
         "inputs": None,
-        "expected": {"result": "failure", "messages": ["No interfaces are PTP enabled"]},
+        "expected": {
+            "result": "failure",
+            "messages": ["No interfaces are PTP enabled"],
+        },
     },
     {
         "name": "failure-invalid-state",
@@ -322,19 +351,81 @@ DATA: list[dict[str, Any]] = [
                     "Ethernet53": {
                         "interface": "Ethernet53",
                         "ptpIntfVlanSummaries": [
-                            {"vlanId": 0, "portState": "none", "delayMechanism": "e2e", "transportMode": "ipv4", "mpassEnabled": False, "mpassStatus": "active"}
+                            {
+                                "vlanId": 0,
+                                "portState": "none",
+                                "delayMechanism": "e2e",
+                                "transportMode": "ipv4",
+                                "mpassEnabled": False,
+                                "mpassStatus": "active",
+                            }
                         ],
                     },
                     "Ethernet1": {
                         "interface": "Ethernet1",
                         "ptpIntfVlanSummaries": [
-                            {"vlanId": 0, "portState": "none", "delayMechanism": "e2e", "transportMode": "ipv4", "mpassEnabled": False, "mpassStatus": "active"}
+                            {
+                                "vlanId": 0,
+                                "portState": "none",
+                                "delayMechanism": "e2e",
+                                "transportMode": "ipv4",
+                                "mpassEnabled": False,
+                                "mpassStatus": "active",
+                            }
                         ],
                     },
                 },
             }
         ],
         "inputs": None,
-        "expected": {"result": "failure", "messages": ["The following interface(s) are not in a valid PTP state: '['Ethernet53', 'Ethernet1']'"]},
+        "expected": {
+            "result": "failure",
+            "messages": [
+                "The following interface(s) are not in a valid PTP state: '['Ethernet53', 'Ethernet1']'"
+            ],
+        },
+    },
+    {
+        "name": "success",
+        "test": VerifyPtpDomain,
+        "eos_data": [
+            {
+                "ptpMode": "ptpBoundaryClock",
+                "ptpProfile": "ptpDefaultProfile",
+                "ptpDomain": "0",
+                "ptpIntfSummaries": {},
+            }
+        ],
+        "inputs": {"domain": "0"},
+        "expected": {"result": "success"},
+    },
+    {
+        "name": "failure",
+        "test": VerifyPtpDomain,
+        "eos_data": [
+            {
+                "ptpMode": "ptpBoundaryClock",
+                "ptpProfile": "ptpDefaultProfile",
+                "ptpDomain": "0",
+                "ptpIntfSummaries": {},
+            }
+        ],
+        "inputs": {"domain": "1"},
+        "expected": {
+            "result": "failure",
+            "messages": ["The device is not in the expected PTP domain: '1'"],
+        },
+    },
+    {
+        "name": "skipped",
+        "test": VerifyPtpDomain,
+        "eos_data": [{"ptpIntfSummaries": {}}],
+        "inputs": {"domain": "0"},
+        "expected": {
+            "result": "skipped",
+            "messages": [
+                "PTP is not configured",
+            ],
+        },
     },
 ]
