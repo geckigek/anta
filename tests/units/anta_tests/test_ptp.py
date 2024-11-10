@@ -383,12 +383,12 @@ DATA: list[dict[str, Any]] = [
         "eos_data": [
             {
                 "ptpMode": "ptpBoundaryClock",
-                "ptpProfile": "ptpDefaultProfile",
-                "ptpDomain": "0",
-                "ptpIntfSummaries": {},
+                "ptpOrdinaryOrBoundaryClock": {
+                    "domainNumber": 0,
+                },
             }
         ],
-        "inputs": {"domain": "0"},
+        "inputs": {"domain": 0},
         "expected": {"result": "success"},
     },
     {
@@ -397,12 +397,12 @@ DATA: list[dict[str, Any]] = [
         "eos_data": [
             {
                 "ptpMode": "ptpBoundaryClock",
-                "ptpProfile": "ptpDefaultProfile",
-                "ptpDomain": "0",
-                "ptpIntfSummaries": {},
+                "ptpOrdinaryOrBoundaryClock": {
+                    "domainNumber": 0,
+                },
             }
         ],
-        "inputs": {"domain": "1"},
+        "inputs": {"domain": 1},
         "expected": {
             "result": "failure",
             "messages": ["The device is not in the expected PTP domain: '1'"],
@@ -411,7 +411,11 @@ DATA: list[dict[str, Any]] = [
     {
         "name": "skipped",
         "test": VerifyPtpDomain,
-        "eos_data": [{"ptpIntfSummaries": {}}],
+        "eos_data": [
+            {
+                "ptpOrdinaryOrBoundaryClock": {},
+            }
+        ],
         "inputs": {"domain": "0"},
         "expected": {
             "result": "skipped",

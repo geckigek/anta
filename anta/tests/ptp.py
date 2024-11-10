@@ -251,12 +251,12 @@ class VerifyPtpDomain(AntaTest):
     class Input(AntaTest.Input):
         """Input model for the VerifyPtpDomain test."""
 
-        domain: str
+        domain: int
         """Expected PTP domain."""
 
     description = "Verifies that the PTP domain is configured correctly."
     categories: ClassVar[list[str]] = ["ptp"]
-    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp", revision=2)]
+    commands: ClassVar[list[AntaCommand | AntaTemplate]] = [AntaCommand(command="show ptp local-clock", revision=2)]
 
     @skip_on_platforms(["cEOSLab", "vEOS-lab", "cEOSCloudLab"])
     @AntaTest.anta_test
@@ -264,7 +264,7 @@ class VerifyPtpDomain(AntaTest):
         """Main test function for VerifyPtpDomain."""
         command_output = self.instance_commands[0].json_output
 
-        if (ptp_domain := command_output.get("ptpDomain")) is None:
+        if (ptp_domain := command_output.get("domainNumber")) is None:
             self.result.is_skipped("PTP is not configured")
             return
 
